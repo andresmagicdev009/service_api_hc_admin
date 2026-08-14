@@ -21,7 +21,7 @@ class Tenant(Base):
     slug: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
 
     # URI de conexión a la BD física del tenant, cifrada con Fernet (ver core/security.py)
-    encrypted_db_uri: Mapped[str] = mapped_column(Text, nullable=False)
+    db_uri: Mapped[str] = mapped_column(Text, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     provisioned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
