@@ -2,11 +2,17 @@
 Punto de entrada de la aplicación FastAPI: instancia la app, configura
 middlewares (CORS) y registra el router principal de la API v1.
 """
-from fastapi import FastAPI
+from alembic.util import status
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from db import session 
+
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -25,6 +31,23 @@ if settings.BACKEND_CORS_ORIGINS:
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-@app.get("/health", tags=["Health"])
-def health_check():
-    return {"status": "ok", "environment": settings.ENVIRONMENT}
+@app.get("/health", status_code=status.HTTP_200_OK, tags=["Health"])
+async def health_check(db: AsyncSession = Depends(session.get_db_session)):
+    try:
+        # Se ejecuta una consula rapida sobre la sesion actual 
+        result = await db.execute(text("SELECT 1"))
+        if result.scalar() == 1:
+            return {
+                "status": "healthy",
+                "database": "connected"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"status": "unhealthy", "database": "unexpected response"}
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"status": "unhealthy", "database": str(e)}
+        )
