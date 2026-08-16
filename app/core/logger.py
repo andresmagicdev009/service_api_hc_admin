@@ -44,4 +44,4 @@ def setup_logger(name: str = "su_app") -> logging.Logger:
 
     return logger
 
-logger = setup_logger("app")
+logger = setup_logger("admin-core-api")

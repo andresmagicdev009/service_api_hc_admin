@@ -60,5 +60,5 @@ app.add_middleware(ClientIPMiddleware)
 
 @app.get("/hello-world")
 async def get_users():
-    logger.info("Hello world from the moon!")
+    logger.info("Consulta de datos de inventario")
     return {"message": "Success"}
