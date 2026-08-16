@@ -2,6 +2,7 @@
 Punto de entrada de la aplicación FastAPI: instancia la app, configura
 middlewares (CORS) y registra el router principal de la API v1.
 """
+from app.core.logger import logger
 from alembic.util import status
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.router import api_router
 from app.core.config import settings
-from db import session 
+from app.core.middleware import ClientIPMiddleware
+from app.db import data_connect as connection_to_db
 
 
 
@@ -32,7 +34,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health", status_code=status.HTTP_200_OK, tags=["Health"])
-async def health_check(db: AsyncSession = Depends(session.get_db_session)):
+async def health_check(db: AsyncSession = Depends(connection_to_db.get_db_session)):
     try:
         # Se ejecuta una consula rapida sobre la sesion actual 
         result = await db.execute(text("SELECT 1"))
@@ -50,4 +52,13 @@ async def health_check(db: AsyncSession = Depends(session.get_db_session)):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={"status": "unhealthy", "database": str(e)}
-        )
+        )  
+        
+        
+# Registro del middleware para capturar la IP del cliente
+app.add_middleware(ClientIPMiddleware)
+
+@app.get("/hello-world")
+async def get_users():
+    logger.info("Hello world from the moon!")
+    return {"message": "Success"}

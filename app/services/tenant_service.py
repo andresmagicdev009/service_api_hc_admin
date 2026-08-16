@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import TenantAlreadyExistsException, TenantNotFoundException
 from app.core.security import decrypt_value, encrypt_value
-from app.models.tenant import Tenant
+from app.models.user import Tenant
 from app.schemas.tenant import TenantCreate, TenantUpdate
 
 

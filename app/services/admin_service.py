@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
-from app.models.admin import AdminUser
+from app.models.tenant_user import AdminUser
 from app.schemas.admin import AdminCreate
 
 MAX_FAILED_ATTEMPTS = 5

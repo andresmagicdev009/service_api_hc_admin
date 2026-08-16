@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.admin import AdminSession
+from app.models.tenant_user import AdminSession
 
 
 def create_admin_session(
