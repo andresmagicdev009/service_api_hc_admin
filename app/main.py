@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.core.middleware import ClientIPMiddleware
+from app.middlewares.middleware import ClientIPMiddleware
 from app.db import data_connect as connection_to_db
 
 

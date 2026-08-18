@@ -6,6 +6,10 @@ no se use directamente (evita el error 'no changes detected').
 """
 from sqlalchemy.orm import DeclarativeBase
 
+
 class Base(DeclarativeBase):
     pass
+
+
+from app.modules.auth.model import UserSession
 
