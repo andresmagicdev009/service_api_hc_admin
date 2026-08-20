@@ -1,9 +1,11 @@
+from sqlalchemy import UUID
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from app.modules.user.model import User, Tenant, UserRoleEnum, TenantStatusEnum
-from app.modules.user.schema import UserCreate, TenantCreate
+from app.modules.user.schema import UserCreate, TenantCreate, AdminUserUpdate
 
+# Codigo que se debe refactorizar para que no se repita en otros servicios
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -65,3 +67,41 @@ class UserService:
         db.refresh(new_user)
         return new_user
     
+    
+    @staticmethod
+    def update_user_by_admin(db: Session, user_id: UUID, user_in: AdminUserUpdate, current_admin: User) -> User:
+        
+        # Buscar el usuario por id 
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No se ha encontrado el usuario especificado."
+            )
+        
+        if user.tenant_id != current_admin.tenant_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tiene permisos para modificar usuarios de otro tenant."
+            )
+            
+        # Si intenta cambiar el email, verificar que no esté registrado en otro usuario 
+        if user_in.email and user_in.email != user.email:
+            existing = db.query(User).filter(User.email == user_in.email).first()
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Vaya al parecer ya existe una cuenta con este correo electrónico. !"
+                )
+        
+        # Aplicar cambios enviados (incluye role e is_active)
+        update_data = user_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(user, field, value)
+        
+        db.commit()
+        db.refresh(user)
+        return user
+    
+    
+        

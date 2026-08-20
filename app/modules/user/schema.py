@@ -31,8 +31,38 @@ class UserResponse(BaseModel):
     tenant_id: UUID
     email: EmailStr
     full_name: str
-    role: UserRoleEnum
     is_active: bool
 
     class Config:
         from_attributes = True
+
+"""______
+               .-"      "-.
+              /            \
+             |              |
+             |,  .-.  .-.  ,|
+             | )(__/  \__)( |
+             |/     /\     \|
+             (_     ^^     _)
+              \__|IIIIII|__/
+               | \IIIIII/ |
+                \        /
+                 `------'
+
+"""
+#Possible escalation of privileges | Possible mitigation to study
+# Only an admin can change a role
+class AdminUserUpdate(BaseModel):
+    full_name: Optional[str]
+    email: Optional[EmailStr]
+    role: Optional[UserRoleEnum]
+    is_active: Optional[bool]
+
+
+# Por seguridad los usuarios normales no pueden cambiar el rol ni el estado de activación de otros usuarios, solo pueden cambiar su nombre y correo electrónico.
+class UserUpdate(BaseModel):
+    full_name: Optional[str]
+    email: Optional[EmailStr]
+    is_active: Optional[bool]
+    
+    

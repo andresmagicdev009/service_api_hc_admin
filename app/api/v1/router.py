@@ -1,8 +1,10 @@
 """Agregador de rutas de la versión 1 de la API."""
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import admin_auth, tenant_users, tenants
+from app.modules.auth.routes import router as auth_router
 
 api_router = APIRouter()
+
+api_router.include_router(auth_router)
 
 

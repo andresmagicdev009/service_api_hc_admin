@@ -16,7 +16,7 @@ class UserRoleEnum(str, enum.Enum):
     SUPER_ADMIN = "SUPER_ADMIN"
     ADMIN = "ADMIN"
     OPERATOR = "OPERATOR"
-    
+    CUSTOMER_TENANT = "CUSTOMER TENANT"
 class Tenant(Base):
     __tablename__ = "tenants"
     __table_args__ = {"schema": "admin_schema"}
